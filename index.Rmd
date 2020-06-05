@@ -1,0 +1,57 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+install.packages("devtools")
+devtools::install_github("jhudsl/collegeIncome")
+library(collegeIncome)
+data(college)
+```
+```{r}
+devtools::install_github("jhudsl/matahari")
+library(matahari)
+library(tidyverse)
+library(plotly)
+library(ggbiplot)
+```
+
+```{r}
+dance_start(value = FALSE, contents = FALSE)
+```
+
+```{r}
+attach(college)
+names(college)
+```
+
+
+```{r}
+sum(is.na(college))
+college <- college %>% drop_na()
+pca <- prcomp(college[, c(16,12,17,18,8,9,10)], center = TRUE, scale. = TRUE)
+pca_x_df <- data.frame(pca[["x"]])
+pca_name <- colnames(pca_x_df)
+pca.var <- pca$sdev ^ 2
+pca.var.per <- round(pca.var / sum(pca.var) * 100, 1)
+pca_df <- data.frame(name = pca_name, pca_percent = pca.var.per)
+pca_df %>% ggplot(aes(x = name, y = pca_percent)) + geom_col()
+```
+
+
+```{r}
+pca_g <-
+  
+    ggplotly(ggbiplot(
+      pca,
+      obs.scale = 0,
+      var.scale = 0,
+      ellipse = TRUE,
+      groups = college$major_category
+    ))
+  
+pca_g
+```
+
+
+
